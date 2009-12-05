@@ -1,0 +1,30 @@
+IPTABLES (shorewall.compiled fragment)
+
+*mangle
+:PREROUTING ACCEPT [0:0]
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:POSTROUTING ACCEPT [0:0]
+COMMIT
+*nat
+:PREROUTING ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:POSTROUTING ACCEPT [0:0]
+COMMIT
+*filter
+:INPUT DROP [0:0]
+:FORWARD DROP [0:0]
+:OUTPUT ACCEPT [0:0]
+:net67_in - [0:0]
+:net70_in - [0:0]
+-A INPUT -p 1 --icmp-type 3/3 -j net70_in
+-A INPUT -p 6 -s 1.2.3.4 -j net67_in
+-A INPUT -p 17 -d 10.0.0.1 --dport 80 -j ACCEPT
+-A net67_in -d 5.6.7.8 -j net70_in
+-A net67_in -d 10.0.0.1 -j ACCEPT
+-A net70_in --dport 54 -j REJECT
+COMMIT
+
+blablabla
+

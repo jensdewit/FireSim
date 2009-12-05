@@ -1,0 +1,47 @@
+IPTABLES (shorewall.compiled fragment)
+
+*mangle
+:PREROUTING ACCEPT [0:0]
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:POSTROUTING ACCEPT [0:0]
+COMMIT
+*nat
+:PREROUTING ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:POSTROUTING ACCEPT [0:0]
+COMMIT
+*filter
+:INPUT DROP [0:0]
+:FORWARD DROP [0:0]
+:OUTPUT ACCEPT [0:0]
+:net67_in - [0:0]
+:net70_in - [0:0]
+-A INPUT -i net67 -j ACCEPT
+-A INPUT -p 1 --icmp-type 3/3 -j net67_in
+-A INPUT -p 6 -s 1.2.3.4 -j REJECT
+-A INPUT -p 6 --dport 80 --tcp-flags ACK,SYN NONE -j net70_in
+-A INPUT -p 6 -m multiport --destination-ports 40:90,789,456:458 -j net70_in
+-A INPUT -m addrtype --src-type BROADCAST -j DROP
+-A INPUT -p 17 --sports 2:3,659,56,40:60 -j REJECT --reject-with tcp-reset
+-A INPUT -p 17 -d 10.0.0.1 --dport 80 -j ACCEPT
+__EOF__
+	
+	TRN_NETWORKS=143.129.67.80
+    for source in $TRN_NETWORKS; do
+	echo "-A INPUT -s $source -j REJECT " >&3
+    done
+
+    cat >&3 << __EOF__
+-A FORWARD -p 6 --sport 80 -j ACCEPT
+-A OUTPUT -p 17 -j DROP
+-A net67_in -s 5.6.7.8 -j DROP
+-A net67_in -d 10.0.0.1 -j ACCEPT
+-A net70_in -d 1.2.3.4 -j DROP
+-A net70_in -s 10.0.0.1 -j ACCEPT
+-A net70_in --dport 54 -j net67_in
+COMMIT
+
+blablabla
+

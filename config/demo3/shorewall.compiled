@@ -1,0 +1,30 @@
+IPTABLES (shorewall.compiled fragment)
+
+*mangle
+:PREROUTING ACCEPT [0:0]
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:POSTROUTING REJECT [0:0]
+-A POSTROUTING -p 17 --dport 150 -j ACCEPT
+COMMIT
+*nat
+:PREROUTING ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:POSTROUTING ACCEPT [0:0]
+-A PREROUTING -d 10.0.0.2 -j DNAT --to-destination 10.1.0.2:150
+COMMIT
+*filter
+:INPUT DROP [0:0]
+:FORWARD DROP [0:0]
+:OUTPUT ACCEPT [0:0]
+:net67_in - [0:0]
+:net70_in - [0:0]
+-A FORWARD -p 17 -d 10.0.0.2 -j DROP
+-A FORWARD -p 17 --dport 80 -j DROP
+-A FORWARD -p 17 -d 10.1.0.2 -j ACCEPT
+-A FORWARD -p 17 -j REJECT
+COMMIT
+
+blablabla
+
