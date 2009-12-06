@@ -32,13 +32,9 @@ DPFN = $(PFN)_$(COPT)
 #------------------------------------------------------
 # Location for binary files
 #------------------------------------------------------
-EXEDIR   = $(PHOME)/bin/$(PFN)
-#EXEDIR   = $(HOME)/bin/$(PFN)/$(PNAME)
-#EXEDIR   = .
+EXEDIR   = $(PHOME)
 
 OBJDIR   = $(PHOME)/obj/$(PFN)
-#OBJDIR   = $(HOME)/obj/$(PFN)/$(PNAME)
-#OBJDIR   = .
 
 #------------------------------------------------------
 # Location for project static library file

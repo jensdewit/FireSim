@@ -63,6 +63,8 @@ private:
 
 	/**
 	 * Private helper method.
+	 * @param tableName Table to parse.
+	 * @param config_path The directory where the configuration files are located.
 	 */
 	Table* parseTable(std::string tableName);
 

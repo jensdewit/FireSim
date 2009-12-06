@@ -37,14 +37,17 @@ ConfigParser* ConfigParser::fInstance = 0;
 void checkDump(std::string dump, std::string outInterface, std::string inInterface, NetworkLayout* networkLayout);
 bool fileExist(std::string path);
 
-ConfigParser::ConfigParser() {
+ConfigParser::ConfigParser(std::string path): _path(path) {
+}
+
+void ConfigParser::createInstance(std::string path) {
+	if (fInstance == 0) {
+		fInstance = new ConfigParser(path);
+	}
 }
 
 ConfigParser* ConfigParser::getInstance() {
-	if (fInstance == 0) {
-		//create the 1 instance of the object (singleton)
-		fInstance = new ConfigParser();
-	}
+	assert(fInstance);
 	return fInstance;
 }
 
@@ -229,7 +232,7 @@ void ConfigParser::parse(Poco::XML::Document* xmlDocument, NetworkLayout* networ
 			} else if (elementNode->nodeName() == XMLConstants::DUMP_TAG) {
 				std::string dumpFile = textNode->nodeValue();
 				removeWhitespace(dumpFile);
-				std::string path = CONFIG_PATH + dumpFile;
+				std::string path = _path + dumpFile;
 				if(!fileExist(path)){
 					std::cout << "config.xml: The specified input dump file " << textNode->nodeValue() << " is not found in the config folder." << std::endl;
 					exit(1);

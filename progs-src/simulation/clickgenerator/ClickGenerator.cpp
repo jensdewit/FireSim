@@ -36,14 +36,14 @@ ClickGenerator::~ClickGenerator() {
 		delete _natTable;
 	}
 }
-void ClickGenerator::generateSimulation(std::ostream& output) {
+void ClickGenerator::generateSimulation(std::ostream& output, std::string config_path) {
 	Poco::XML::DOMParser DOMparser;
 
 	//Parse network layout
 	try {
 		//Skip whitespace
 		DOMparser.setFeature("http://www.appinf.com/features/no-whitespace-in-element-content", false);
-		Poco::XML::Document* xmlDoc = DOMparser.parse(CONFIG_PATH + NETWORKLAYOUT_FILENAME);
+		Poco::XML::Document* xmlDoc = DOMparser.parse(config_path + NETWORKLAYOUT_FILENAME);
 		NetworkParser* networkParser = NetworkParser::getInstance();
 		_networkLayout = networkParser->parse(xmlDoc);
 	} catch (Poco::XML::SAXParseException e){
@@ -51,7 +51,7 @@ void ClickGenerator::generateSimulation(std::ostream& output) {
 		exit(1);
 	}
 	//Parse shorewall compiled
-	ShorewallParser::createInstance(CONFIG_PATH + SHOREWALLCOMPILED_FILENAME, _networkLayout);
+	ShorewallParser::createInstance(config_path, _networkLayout);
 	ShorewallParser* parser = ShorewallParser::getInstance();
 	_filterTable = parser->parseFilterTable();
 	_natTable = parser->parseNatTable();
@@ -60,7 +60,8 @@ void ClickGenerator::generateSimulation(std::ostream& output) {
 	ConfigParser* configParser = 0;
 	try {
 		//Parse configuration
-		Poco::XML::Document* xmlDoc2 = DOMparser.parse(CONFIG_PATH + CONFIG_FILENAME);
+		Poco::XML::Document* xmlDoc2 = DOMparser.parse(config_path + CONFIG_FILENAME);
+		ConfigParser::createInstance(config_path);
 		configParser = ConfigParser::getInstance();
 		configParser->parse(xmlDoc2, _networkLayout);
 	} catch (Poco::XML::SAXParseException e){
@@ -127,7 +128,7 @@ void ClickGenerator::generateSimulation(std::ostream& output) {
 	output << "//Faulty accept output queue" << std::endl;
 	output << "copy[0] -> faulty_accept_queue :: SimpleQueue" << std::endl;
 	output << "	-> faulty_accept :: PokeUnqueue" << std::endl;
-	output << "	-> ToDump(\"" << OUTPUT_PATH << "faulty_accept.dump\");";
+	output << "	-> ToDump(\"" << OUTPUT_PATH << "faulty_accept.dump\");" << std::endl;
 	output << std::endl;
 
 	output << "//Faulty reject output queue" << std::endl;

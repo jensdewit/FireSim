@@ -50,28 +50,27 @@ bool checkFile(std::string path){
 /**
  * Main method of FireSim
  */
-int main(int argc, char **argv) {
+int main(int argc, char *argv[]) {
 	removeFiles(read_directory(OUTPUT_PATH), OUTPUT_PATH);
 
 	//Initialize logging system
+	//Message priorities: Fatal, Critical, Error, Warning, Notice, Information, Debug, Trace
 	// set up channel chains
 	FormattingChannel* pFCConsole = new FormattingChannel(new PatternFormatter("%t"));
 	SplitterChannel* splitter = new SplitterChannel();
 	splitter->addChannel(new ConsoleChannel);
-//	FileChannel* logFileChannel = new FileChannel("firesim.log");
-//	splitter->addChannel(logFileChannel);
 	pFCConsole->setChannel(splitter);
 	pFCConsole->open();
-
-//	FormattingChannel* pFCFile = new FormattingChannel(new PatternFormatter("%d-%m-%Y %H:%M:%S.%c %N[processID %P]: %p: %t"));
-//	pFCFile->setChannel(logFileChannel);
-//	pFCFile->open();
-
-	//Message priorities: Fatal, Critical, Error, Warning, Notice, Information, Debug, Trace
-	// create two Logger objects - one for
-	// each channel chain.
 	Logger::create("ConsoleLogger", pFCConsole, Message::PRIO_INFORMATION);
-//	Logger::create("FileLogger", pFCFile, Message::PRIO_ERROR);
+
+	if (argc != 2) {
+		Logger::get("ConsoleLogger").error("syntax: firewallsimulation config-dir");
+		Logger::get("ConsoleLogger").error("E.g. : 	./firewallsimulation ../../config/demo1");
+		exit(1);
+	}
+
+//	Logger::get("ConsoleLogger").information("dir: " + std::string(argv[2]));
+	std::string config_path(argv[1]);
 
 	//print ascii-logo
 	std::stringstream stringstream;
@@ -81,8 +80,8 @@ int main(int argc, char **argv) {
 	//Check whether required input files are present in config folder
 	Logger::get("ConsoleLogger").information("Required input files:");
 	//shorewall.compiled
-	Poco::StringTokenizer shorewallCompiledTokenizer(CONFIG_PATH + SHOREWALLCOMPILED_FILENAME, "/", Poco::StringTokenizer::TOK_IGNORE_EMPTY);
-	if (checkFile(CONFIG_PATH + SHOREWALLCOMPILED_FILENAME)){
+	Poco::StringTokenizer shorewallCompiledTokenizer(config_path + SHOREWALLCOMPILED_FILENAME, "/", Poco::StringTokenizer::TOK_IGNORE_EMPTY);
+	if (checkFile(config_path + SHOREWALLCOMPILED_FILENAME)){
 		Logger::get("ConsoleLogger").information(shorewallCompiledTokenizer[shorewallCompiledTokenizer.count()-1] + " is found in config folder.");
 	} else {
 		Logger::get("ConsoleLogger").information(shorewallCompiledTokenizer[shorewallCompiledTokenizer.count()-1] + " is not found in config folder. Shorewall can generate this file.");
@@ -90,8 +89,8 @@ int main(int argc, char **argv) {
 	}
 
 	//config.xml
-	Poco::StringTokenizer configTokenizer(CONFIG_PATH + CONFIG_FILENAME, "/", Poco::StringTokenizer::TOK_IGNORE_EMPTY);
-	if (checkFile(CONFIG_PATH + CONFIG_FILENAME)){
+	Poco::StringTokenizer configTokenizer(config_path + CONFIG_FILENAME, "/", Poco::StringTokenizer::TOK_IGNORE_EMPTY);
+	if (checkFile(config_path + CONFIG_FILENAME)){
 		Logger::get("ConsoleLogger").information(configTokenizer[configTokenizer.count()-1] + " is found in config folder.");
 	} else {
 		Logger::get("ConsoleLogger").information(configTokenizer[configTokenizer.count()-1] + " is not found in config folder. See README.txt for more info.");
@@ -99,8 +98,8 @@ int main(int argc, char **argv) {
 	}
 
 	//network_layout.xml
-	Poco::StringTokenizer networkLayoutTokenizer(CONFIG_PATH + NETWORKLAYOUT_FILENAME, "/", Poco::StringTokenizer::TOK_IGNORE_EMPTY);
-	if (checkFile(CONFIG_PATH + NETWORKLAYOUT_FILENAME)){
+	Poco::StringTokenizer networkLayoutTokenizer(config_path + NETWORKLAYOUT_FILENAME, "/", Poco::StringTokenizer::TOK_IGNORE_EMPTY);
+	if (checkFile(config_path + NETWORKLAYOUT_FILENAME)){
 		Logger::get("ConsoleLogger").information(networkLayoutTokenizer[networkLayoutTokenizer.count()-1] + " is found in config folder.");
 	} else {
 		Logger::get("ConsoleLogger").information(networkLayoutTokenizer[networkLayoutTokenizer.count()-1] + " is not found in config folder. Run [$config]/firewall_config_extract.sh on your firewall. It will generate " + networkLayoutTokenizer[networkLayoutTokenizer.count()-1]);
@@ -108,8 +107,8 @@ int main(int argc, char **argv) {
 	}
 
 	//script_vars.sh
-	Poco::StringTokenizer scriptVarsTokenizer(CONFIG_PATH + SCRIPT_VARS_FILENAME, "/", Poco::StringTokenizer::TOK_IGNORE_EMPTY);
-	if (checkFile(CONFIG_PATH + SCRIPT_VARS_FILENAME)){
+	Poco::StringTokenizer scriptVarsTokenizer(config_path + SCRIPT_VARS_FILENAME, "/", Poco::StringTokenizer::TOK_IGNORE_EMPTY);
+	if (checkFile(config_path + SCRIPT_VARS_FILENAME)){
 		Logger::get("ConsoleLogger").information(scriptVarsTokenizer[scriptVarsTokenizer.count()-1] + " is found in config folder.");
 	} else {
 		Logger::get("ConsoleLogger").information(scriptVarsTokenizer[scriptVarsTokenizer.count()-1] + " is not found in config folder. Run [$config]/firewall_config_extract.sh on your firewall. It will generate " + scriptVarsTokenizer[scriptVarsTokenizer.count()-1]);
@@ -125,7 +124,7 @@ int main(int argc, char **argv) {
 
 	//Generate click script for simulation
 	ClickGenerator clickGenerator;
-	clickGenerator.generateSimulation(clickSimulationScript);
+	clickGenerator.generateSimulation(clickSimulationScript, config_path);
 	clickSimulationScript.close();
 	clickGenerator.generateTraces(clickTraceScript);
 	clickTraceScript.close();

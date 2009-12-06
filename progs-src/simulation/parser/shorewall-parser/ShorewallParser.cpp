@@ -49,7 +49,7 @@ ShorewallParser* ShorewallParser::getInstance() {
 
 Table* ShorewallParser::parseTable(std::string tableName) {
 	std::ifstream stream;
-	stream.open(_path.c_str(), std::ios::binary | std::ios::in);
+	stream.open((_path + SHOREWALLCOMPILED_FILENAME).c_str(), std::ios::binary | std::ios::in);
 
 	//path must be correct
 	assert(stream.is_open());
@@ -102,7 +102,7 @@ Table* ShorewallParser::parseTable(std::string tableName) {
 				//debug print
 				Poco::Logger::get("ConsoleLogger").debug("script found:\n " + script + "\n");
 				ScriptResolver scriptResolver(script);
-				inputs += scriptResolver.resolve();
+				inputs += scriptResolver.resolve(_path);
 				//update EOFstart
 				posEOFstart = input.find("__EOF__", posEOFstop + std::string("__EOF__").length());
 			} while (posEOFstart < posCommit);

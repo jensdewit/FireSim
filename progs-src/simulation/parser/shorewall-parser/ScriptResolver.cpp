@@ -18,13 +18,13 @@
 #include "ScriptResolver.h"
 #include "../../ApplicationConstants.h"
 
-std::string ScriptResolver::resolve(){
+std::string ScriptResolver::resolve(std::string config_path){
 	Poco::Logger::get("ConsoleLogger").debug("script resolving...");
 	//Set up temporary output
 	std::ofstream script;
 	script.open("script_resolver.sh");
 	//include general variables specific for a certain firewall.
-	script << ". " << CONFIG_PATH << SCRIPT_VARS_FILENAME << std::endl;
+	script << ". " << config_path << SCRIPT_VARS_FILENAME << std::endl;
 	script << "exec 3<> script_resolved.txt" << std::endl;
 	script << _script << std::endl;
 	script << "exec 3>&-" << std::endl;

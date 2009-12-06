@@ -29,7 +29,13 @@
 class ConfigParser {
 public:
 	/**
-	 * Returns a reference to a {@link ConfigParser}
+	 * Creates a unique instance of this class.
+	 * @param path The file path of the config files
+	 */
+	static void createInstance(std::string path);
+
+	/**
+	 * Returns the unique instance of this class.
 	 */
 	static ConfigParser* getInstance();
 
@@ -47,9 +53,11 @@ public:
 private:
 	/**
 	 * Private constructor. Use static method getInstance instead of constructor.
+	 * @param path The file path of the config files
 	 */
-	ConfigParser();
+	ConfigParser(std::string path);
 
+	std::string _path;
 	std::vector<ConfigContent*> _content;
 
 	static ConfigParser* fInstance;

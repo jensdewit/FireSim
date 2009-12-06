@@ -30,8 +30,9 @@ public:
 	/**
 	 * Generate a simulation click script, based on the current shorewall parser.
 	 * @param output This is the output stream. The generated click script will be printed to this stream.
+	 * @param config_path The directory where the configuration files are located.
 	 */
-	void generateSimulation(std::ostream& output);
+	void generateSimulation(std::ostream& output, std::string config_path);
 
 	/**
 	 * Generate a trace click script for the last runned simulation, based on the current shorewall parser.

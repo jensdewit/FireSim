@@ -23,9 +23,10 @@ public:
 
 	/**
 	 * Run the script and return the output
+	 * @param config_path The directory where the configuration files are located.
 	 * @return scripts output
 	 */
-	std::string resolve();
+	std::string resolve(std::string config_path);
 
 private:
 	std::string _script;
